@@ -1,17 +1,5 @@
 
-# Praktikum Verteilte Systeme
-
-Document "Anforderungsanalyse" can be found here: https://docs.google.com/document/d/1FO7eDe20AQNggIx9FLcn10mOFHU6usgYtx0Ea0Cp7X0/edit?usp=sharing
-
-GitLab-Issues have been created according to the document.
-
----
-
-Table of Contents
-
-[[_TOC_]]
-
----
+# Virtual Power Plant Grid
 
 # Setup
 0) Optional: modify `docker-compose.yml`
@@ -135,10 +123,6 @@ For debbugging purposes you can use the following command to simulate a UDP-Serv
 
 `nc -kluvw 1 localhost 13337`
 
-# Tests
-# AP2 (aufgabe 2)
-- see https://code.fbi.h-da.de/istlskeil/vs_ss21_theflash/-/issues/5#note_166050
-
 # Replication
 
 In order to facilitate data replication, separate mqtt topics have been added.
@@ -154,7 +138,6 @@ MasterNode 1 will then publish this data to its outgoing topic *masternode-1-out
 In order to achieve replication, each MasterNode can then collect data from other MasterNode's *outgoing*-topics.
 So in our example, MasterNode 2 can subscribe to the *masternode-1-outgoing* topic to be able to collect data from MasterNode 1.
 With this architecture, each MasterNode can subscribe to the *outgoing*-topic of the other MasterNodes in order to replicate their data.
-This essentially implements a master/slave-architecture.
 
 ![mqtt-topics](doc/mqtt-topics.jpg)
 
