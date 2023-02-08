@@ -1,0 +1,129 @@
+version: "3.9"
+services:
+  masternode-1:
+    build:
+      context: ./MasterNode
+      dockerfile: Dockerfile
+    environment:
+      - MASTERNODEID=1
+      - CONNECTIONTYPE=MQTT
+      - NODERPCPORT=5002
+      - HEALTHCHECKTIMEOUT=10
+      - MASTERNODERPCPORT=5001
+      - MQTTBROKERADDRESS=mqtt
+      - MQTTBROKERPORT=1883
+      - OTHERMASTERNODEIDS=2
+    ports:
+      - "8081:8081"
+  masternode-2:
+    build:
+      context: ./MasterNode
+      dockerfile: Dockerfile
+    environment:
+      - MASTERNODEID=2
+      - CONNECTIONTYPE=MQTT
+      - NODERPCPORT=5002
+      - HEALTHCHECKTIMEOUT=10
+      - MASTERNODERPCPORT=5001
+      - MQTTBROKERADDRESS=mqtt
+      - MQTTBROKERPORT=1883
+      - OTHERMASTERNODEIDS=1
+    ports:
+      - "8082:8082"
+  mqtt:
+    container_name: mqtt
+    image: eclipse-mosquitto
+    restart: always
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/log:/var/log/mosquitto.log
+  externalclient:
+    build:
+      context: ./ExternalClient
+      dockerfile: Dockerfile
+    environment:
+      - MASTERNODERPCPORT=5001
+      - NODERPCPORT=5002
+      - MASTERNODEIDS=1,2
+      - HEALTHCHECKRATE=5
+    ports:
+      - "8080:8080"
+  windkraftanlage:
+    build:
+      context: ./Node
+      dockerfile: Dockerfile
+    depends_on:
+      - "mqtt"
+    environment:
+      - ID=1
+      - TYPE=P
+      - NAME=Windkraftanlage
+      - CONNECTIONTYPE=MQTT
+      - VALUEMIN=1000
+      - VALUEMAX=1200
+      - MASTERNODEID=1
+      - MASTERNODEPORT=13337
+      - RPCPORT=5002
+      - SENDRATE=5
+      - CORRUPTDATARATE=0
+      - MQTTBROKERADDRESS=mqtt
+      - MQTTBROKERPORT=1883
+  solaranlage:
+    build:
+      context: ./Node
+      dockerfile: Dockerfile
+    depends_on:
+      - "mqtt"
+    environment:
+      - ID=2
+      - TYPE=P
+      - NAME=Solaranlage
+      - CONNECTIONTYPE=MQTT
+      - VALUEMIN=100
+      - VALUEMAX=120
+      - MASTERNODEID=1
+      - MASTERNODEPORT=13337
+      - RPCPORT=5002
+      - SENDRATE=5
+      - CORRUPTDATARATE=0
+      - MQTTBROKERADDRESS=mqtt
+      - MQTTBROKERPORT=1883
+  haushalt:
+    build:
+      context: ./Node
+      dockerfile: Dockerfile
+    environment:
+      - ID=3
+      - TYPE=C
+      - NAME=Haushalt
+      - CONNECTIONTYPE=MQTT
+      - VALUEMIN=100
+      - VALUEMAX=120
+      - MASTERNODEID=2
+      - MASTERNODEPORT=13337
+      - RPCPORT=5002
+      - SENDRATE=5
+      - CORRUPTDATARATE=0
+      - MQTTBROKERADDRESS=mqtt
+      - MQTTBROKERPORT=1883
+  fabrik:
+    build:
+      context: ./Node
+      dockerfile: Dockerfile
+    environment:
+      - ID=4
+      - TYPE=C
+      - NAME=Fabrik
+      - CONNECTIONTYPE=MQTT
+      - VALUEMIN=1000
+      - VALUEMAX=1200
+      - MASTERNODEID=2
+      - MASTERNODEPORT=13337
+      - RPCPORT=5002
+      - SENDRATE=5
+      - CORRUPTDATARATE=0
+      - MQTTBROKERADDRESS=mqtt
+      - MQTTBROKERPORT=1883

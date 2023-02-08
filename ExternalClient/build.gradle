@@ -1,0 +1,42 @@
+plugins {
+    // Apply the java plugin to add support for Java
+    id 'java'
+
+    // Apply the application plugin to add support for building an application
+    id 'application'
+}
+
+repositories {
+    // Use jcenter for resolving your dependencies.
+    // You can declare any Maven/Ivy/file repository here.
+    jcenter()
+}
+
+dependencies {
+    // This dependency is found on compile classpath of this component and consumers.
+    implementation 'com.google.guava:guava:26.0-jre'
+    implementation group: 'org.json', name: 'json', version: '20210307'
+    compile group: 'org.json', name: 'json', version: '20210307'
+
+    // Add Apache Thrift Framework for RPC communication
+    implementation group: 'org.apache.thrift', name: 'libthrift', version: '0.14.1'
+
+    // Use JUnit test framework
+    testImplementation 'junit:junit:4.12'
+}
+
+jar {
+    // Build jar file
+    manifest {
+        attributes(
+                'Main-Class': 'ExternalClient.Main'
+        )
+    }
+    // Collect and include dependency jar's when compiling
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+// Define the main class for the application
+mainClassName = 'ExternalClient.Main'
